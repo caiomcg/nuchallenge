@@ -13,25 +13,33 @@ pub struct Account {
 
 impl Account {
     pub fn new(available_limit: i64, active_card: bool) -> Self {
-        Account {
+        let account = Account {
             active_card,
             available_limit,
             violations: Vec::new(),
             transactions: Vec::new(),
-        }
+        };
+
+        debug!("Registere new account: {:?}", account);
+
+        account
     }
 
     #[allow(dead_code)]
     pub fn toggle_active(&mut self) {
+        debug!("Toogled account active_card to {}", self.active_card);
         self.active_card = !self.active_card;
     }
 
     pub fn try_reinitialize(&mut self) {
+        error!("Trying to recreate an account");
         self.violations.clear();
         self.violations.push(ProcessmentError::AccountAlreadyInitialized);
     }
 
     pub fn process_transaction(&mut self, transaction: Transaction) {
+        debug!("Processing a new transaction {:?}", transaction);
+
         self.violations.clear();
 
         match self.active_card {
@@ -53,7 +61,7 @@ impl Account {
                     Err(e) => self.violations.push(e)
                 };
 
-                self.transactions.push(transaction); // perguntar -> Devo inserir uma transacao se a conta não estiver ativa? (ELABORE)
+                self.transactions.push(transaction);
             },
             false => self.violations.push(ProcessmentError::CardNotActive)
         };
@@ -73,7 +81,7 @@ impl Account {
             let divergence = match transaction.get_time_diff(previous_transaction) {
                 Ok(diff) => diff,
                 Err(e) => {
-                    //LOG,
+                    error!("Could not calculate time divergency: {}", e);
                     return Some(ProcessmentError::InternalServerError);
                 }
             }.num_minutes();
@@ -96,7 +104,7 @@ impl Account {
             let divergence = match transaction.get_time_diff(previous_transaction) {
                 Ok(diff) => diff,
                 Err(e) => {
-                    //LOG,
+                    error!("Could not calculate time divergency: {}", e);
                     return Some(ProcessmentError::InternalServerError);
                 }
             }.num_minutes();
@@ -109,8 +117,6 @@ impl Account {
         None
     }
 }
-
-// TODO: Add a chain of reponsibility to handle transaction errors
 
 impl std::fmt::Display for Account {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

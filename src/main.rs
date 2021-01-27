@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate log;
+
 mod transaction;
 mod account;
 
@@ -8,6 +11,7 @@ use account::Account;
 use account::ProcessmentError;
 
 fn main() {
+    env_logger::init();
     let mut account: Option<Box<Account>> = None;
 
     let sample_strings = vec![
@@ -69,7 +73,8 @@ r#"{"transaction": {"merchant": "Burger King 65", "amount": 89899550, "time":"20
 r#"{"transaction": {"merchant": "Burger King 65", "amount": 89899550, "time":"2019-02-13T10:45:05.000Z"}}"#
     ];
     for string in sample_strings {
-        //println!("\nIn: {}", string);
+        info!("Processing: {}", string);
+
         match serde_json::from_str::<Value>(string) {
             Ok(json) => {
                 if let Some(content) = json.get("account") {
