@@ -2,6 +2,7 @@ use itertools::Itertools;
 
 use crate::transaction::Transaction;
 use super::ProcessmentError;
+use crate::mapping::{Message, MappingError};
 
 #[derive(Debug)]
 pub struct Account {
@@ -125,5 +126,16 @@ impl std::fmt::Display for Account {
                self.available_limit,
                self.violations.iter().unique().map(|e| format!("\"{}\"", e)).join(", ")
               )
+    }
+}
+
+impl std::convert::TryFrom<Message> for Account {
+    type Error = MappingError;
+
+    fn try_from(message: Message) -> Result<Self, Self::Error> {
+        match message {
+            Message::Account { available_limit, active_card }=> Ok(Account::new(available_limit, active_card)),
+            Message::Transaction { .. } => Err(MappingError::AccountFromTransaction),
+        }
     }
 }

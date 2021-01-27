@@ -1,5 +1,6 @@
 use chrono::prelude::*;
 use super::TransactionError;
+use crate::mapping::{Message, MappingError};
 
 #[derive(Debug, Clone)]
 pub struct Transaction {
@@ -32,5 +33,17 @@ impl PartialEq for Transaction {
     fn eq(&self, other: &Self) -> bool {
         self.merchant == other.merchant &&
             self.amount == other.amount
+    }
+}
+
+impl std::convert::TryFrom<Message> for Transaction {
+    type Error = MappingError;
+
+    fn try_from(message: Message) -> Result<Self, Self::Error> {
+        match message {
+            Message::Account { .. }=> Err(MappingError::TransactionFromAccount),
+            Message::Transaction { merchant, amount, time } => 
+                Ok(Transaction::new(merchant, amount, time))
+        }
     }
 }
