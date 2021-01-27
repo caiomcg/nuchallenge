@@ -13,6 +13,19 @@ use account::Account;
 use account::ProcessmentError;
 use data_provider::provider_factory::{ProviderType, ProviderFactory};
 use mapping::Message;
+use account::validator::{
+    LimitValidator,
+    DoubleTrasactionValidator,
+    MultipleTransactionValidator,
+};
+
+
+fn add_validators(to: &mut Box<Account>) {
+    to.register_validator(Box::new(LimitValidator::new()))
+        .register_validator(Box::new(DoubleTrasactionValidator::new()))
+        .register_validator(Box::new(MultipleTransactionValidator::new()));
+
+}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
@@ -35,7 +48,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     acc.try_reinitialize();
                     println!("{}", acc);
                 } else {
-                    account = Some(Box::new(Account::try_from(message)?));
+                    let mut boxed_account = Box::new(Account::try_from(message)?);
+                    add_validators(&mut boxed_account);
+                    account = Some(boxed_account);
                     println!("{}", account.as_ref().unwrap());
                 }
             },
