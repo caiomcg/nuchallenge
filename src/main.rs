@@ -20,11 +20,14 @@ use account::validator::{
 };
 
 
-fn add_validators(to: &mut Box<Account>) {
-    to.register_validator(Box::new(LimitValidator::new()))
+fn spawn_account(message: Message) -> Result<Box<Account>, Box<dyn std::error::Error>> {
+    let mut account = Box::new(Account::try_from(message)?);
+
+    account.register_validator(Box::new(LimitValidator::new()))
         .register_validator(Box::new(DoubleTrasactionValidator::new()))
         .register_validator(Box::new(MultipleTransactionValidator::new()));
 
+    Ok(account)
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -48,9 +51,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     acc.try_reinitialize();
                     println!("{}", acc);
                 } else {
-                    let mut boxed_account = Box::new(Account::try_from(message)?);
-                    add_validators(&mut boxed_account);
-                    account = Some(boxed_account);
+                    account = Some(spawn_account(message)?);
                     println!("{}", account.as_ref().unwrap());
                 }
             },
