@@ -1,0 +1,6 @@
+{"account": {"active-card": true, "available-limit": 100000000}}
+{"transaction": {"merchant": "Burger King 65", "amount": 10, "time":"2019-02-13T10:45:05.000Z"}}
+{"transaction": {"merchant": "Burger King 65", "amount": 10, "time":"2019-02-13T10:48:05.000Z"}}
+{"transaction": {"merchant": "Burger King 65", "amount": 10, "time":"2019-02-13T10:49:05.000Z"}}
+{"transaction": {"merchant": "Burger King 65", "amount": 10, "time":"2019-02-13T10:49:20.000Z"}}
+{"transaction": {"merchant": "Burger King 65", "amount": 10, "time":"2019-02-13T10:51:05.000Z"}}

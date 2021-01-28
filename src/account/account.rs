@@ -69,11 +69,13 @@ impl Account {
                 }
 
                 match processable.violations.len() {
-                    0 => self.available_limit = processable.limit,
+                    0 => {
+                        self.available_limit = processable.limit;
+                        self.transactions.push(transaction);
+                    },
                     _ => self.violations = processable.violations,
                 }
 
-                self.transactions.push(transaction);
             },
             false => self.violations.push(ProcessmentError::CardNotActive)
         };
