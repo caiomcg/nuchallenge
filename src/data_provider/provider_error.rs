@@ -1,7 +1,9 @@
+#[allow(dead_code)]
 #[derive(Debug)]
 pub enum ProviderError {
     EOF,
     CouldNotReset,
+#[allow(dead_code)]
     UnknownFile,
     FailedToRead,
 }
